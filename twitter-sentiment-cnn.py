@@ -1,8 +1,14 @@
+# coding: utf8
+
 import tensorflow as tf
 import numpy as np
 from random import randint
 from generic_helpers import *
 import os, time, data_helpers
+import csv
+import time
+
+current_milli_time = lambda: int(round(time.time() * 1000))
 
 
 ################
@@ -62,6 +68,7 @@ log("Preprocessing...")
 
 ### Load data ###
 x, y, vocabulary, vocabulary_inv = data_helpers.load_data(FLAGS.reduced_dataset)
+maxLengthInX = max(len(i) for i in x)
 
 # Randomly shuffle data
 np.random.seed(123)
@@ -83,7 +90,7 @@ validate_every = len(y_train)/(FLAGS.batch_size*FLAGS.valid_freq)
 checkpoint_every = len(y_train)/(FLAGS.batch_size*FLAGS.checkpoint_freq)
 
 ### Session variables ###
-sess = tf.InteractiveSession()
+sess = tf.Session()
 
 log("\nFlags:")
 for attr, value in sorted(FLAGS.__flags.iteritems()):
@@ -141,12 +148,23 @@ def evaluate_sentence(sentence, vocabulary):
 	Translates a string to its equivalent in the integer vocabulary and feeds it to the network. 
 	Outputs result to stdout. 
 	"""
-	x_to_eval = data_helpers.string_to_int(sentence, vocabulary, max(len(i) for i in x))
-	result = sess.run(tf.argmax(network_out,1), feed_dict={data_in: x_to_eval, dropout_keep_prob: 1.0})
+	#print(current_milli_time())
+	x_to_eval = data_helpers.string_to_int(sentence, vocabulary, maxLengthInX)
+	#print(current_milli_time())
+	#result = sess.run(tf.argmax(network_out,1), feed_dict={data_in: x_to_eval, dropout_keep_prob: 1.0})
+	#print(current_milli_time())
 	unnorm_result = sess.run(network_out, feed_dict={data_in: x_to_eval, dropout_keep_prob: 1.0})
-	network_sentiment = "POS" if result == 1 else "NEG"
+	#print(current_milli_time())
+
+	network_sentiment = "NEU"
+	if unnorm_result[0].item(1) > 0.6:
+		network_sentiment = "POS"
+	elif unnorm_result[0].item(1) < 0.4:
+		network_sentiment = "NEG"
+
 	log("Custom input evaluation:", network_sentiment)
 	log("Actual output:", str(unnorm_result[0]))
+	return network_sentiment
 
 ###################
 ##### NETWORK #####
@@ -240,8 +258,8 @@ else:
 loss_summary = tf.scalar_summary("Training loss", cross_entropy)
 valid_loss_summary = tf.scalar_summary("Validation loss", valid_mean_loss)
 valid_accuracy_summary = tf.scalar_summary("Validation accuracy", valid_mean_accuracy)
-summary_writer = tf.train.SummaryWriter(SUMMARY_DIR, sess.graph_def)
-tf.merge_all_summaries()
+#summary_writer = tf.train.SummaryWriter(SUMMARY_DIR, sess.graph)
+#tf.merge_all_summaries()
 log("=======================================================")
 
 # Training
@@ -338,3 +356,7 @@ if FLAGS.save:
 	log("Saving checkpoint...")
 	saver = tf.train.Saver()
 	saver.save(sess, CHECKPOINT_FILE_PATH)
+
+while True:
+	t = raw_input("\n\nTweet to analyze: ")
+	print (evaluate_sentence(t, vocabulary))

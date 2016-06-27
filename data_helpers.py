@@ -85,19 +85,15 @@ def pad_sentences(sentences, padding_word="<PAD/>"):
         padded_sentences.append(new_sentence)
     return padded_sentences
 
-def pad_sentences_to(sentences, pad_to, padding_word="<PAD/>"):
+def pad_sentences_to(sentence, pad_to, padding_word="<PAD/>"):
     """
     Pads all sentences to the pad_to lenght. 
     Returns the padded senteces.
     """
-    sequence_length = pad_to
-    padded_sentences = []
-    for i in range(len(sentences)):
-        sentence = sentences[i]
-        num_padding = sequence_length - len(sentence)
-        new_sentence = sentence + [padding_word] * num_padding
-        padded_sentences.append(new_sentence)
-    return padded_sentences
+    num_padding = pad_to - len(sentence)
+    paddings = [padding_word] * num_padding
+    new_sentence = sentence + paddings
+    return new_sentence
 
 def build_vocab():
     """
@@ -127,19 +123,15 @@ def string_to_int(sentence, vocabulary, max_len):
     Converts the given string to the corresponing string encoded in integers.
     Returns the encoded string.
     """
-    #Reads dataset in order to create the vocabulary
-    base = [sentence]
-    base = [s.strip() for s in base]
-    x_text = base
-    x_text = [clean_str(sent) for sent in x_text]
-    x_text = [s.split(" ") for s in x_text]
+
+    x_text = clean_str(sentence).split(" ")
     padded_x_text = pad_sentences_to(x_text, max_len)
-    try: 
-        x = np.array([[vocabulary[word] for word in sentence] for sentence in padded_x_text])
-        return x
-    except KeyError, e:
-        print "The following word is unknown to the network: %s - Try again." % str(e)
-        quit()
+    arrayForNumpy = []
+    rowOfArrayForNumpy = []
+    for word in padded_x_text:
+        rowOfArrayForNumpy.append(vocabulary.get(word, vocabulary["<PAD/>"]))
+    arrayForNumpy.append(rowOfArrayForNumpy)
+    return np.array(arrayForNumpy)
 
 def load_data(reduced_dataset):
     """
