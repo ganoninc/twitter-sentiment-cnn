@@ -85,7 +85,7 @@ def pad_sentences(sentences, padding_word="<PAD/>"):
         padded_sentences.append(new_sentence)
     return padded_sentences
 
-def pad_sentences_to(sentence, pad_to, padding_word="<PAD/>"):
+def pad_sentence_to(sentence, pad_to, padding_word="<PAD/>"):
     """
     Pads all sentences to the pad_to lenght. 
     Returns the padded senteces.
@@ -123,9 +123,8 @@ def string_to_int(sentence, vocabulary, max_len):
     Converts the given string to the corresponing string encoded in integers.
     Returns the encoded string.
     """
-
     x_text = clean_str(sentence).split(" ")
-    padded_x_text = pad_sentences_to(x_text, max_len)
+    padded_x_text = pad_sentence_to(x_text, max_len)
     arrayForNumpy = []
     rowOfArrayForNumpy = []
     for word in padded_x_text:

@@ -5,7 +5,6 @@ import numpy as np
 from random import randint
 from generic_helpers import *
 import os, time, data_helpers
-import csv
 import time
 
 current_milli_time = lambda: int(round(time.time() * 1000))
@@ -258,8 +257,8 @@ else:
 loss_summary = tf.scalar_summary("Training loss", cross_entropy)
 valid_loss_summary = tf.scalar_summary("Validation loss", valid_mean_loss)
 valid_accuracy_summary = tf.scalar_summary("Validation accuracy", valid_mean_accuracy)
-#summary_writer = tf.train.SummaryWriter(SUMMARY_DIR, sess.graph)
-#tf.merge_all_summaries()
+summary_writer = tf.train.SummaryWriter(SUMMARY_DIR, sess.graph)
+tf.merge_all_summaries()
 log("=======================================================")
 
 # Training
