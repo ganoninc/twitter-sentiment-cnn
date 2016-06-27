@@ -284,8 +284,8 @@ if FLAGS.train:
 		train_result, loss_summary_result = sess.run([train_step, loss_summary], feed_dict={data_in: x_batch, data_out: y_batch, dropout_keep_prob: 0.5})
 		
 		# Print training accuracy
-		accuracy_result = accuracy.eval(feed_dict={data_in: x_batch, data_out: y_batch, dropout_keep_prob: 1.0})
-		current_loss = cross_entropy.eval(feed_dict={data_in: x_batch, data_out: y_batch, dropout_keep_prob: 1.0})
+		accuracy_result = accuracy.eval(session=sess, feed_dict={data_in: x_batch, data_out: y_batch, dropout_keep_prob: 1.0})
+		current_loss = cross_entropy.eval(session=sess, feed_dict={data_in: x_batch, data_out: y_batch, dropout_keep_prob: 1.0})
 		current_epoch = 1+(global_step/batches_in_epoch)
 		print("Step %d of %d (epoch %d), training accuracy: %g, loss: %g" % (global_step, total_num_step, current_epoch, accuracy_result,current_loss))
 
@@ -301,8 +301,8 @@ if FLAGS.train:
 			losses = []
 			for test_batch in test_batches:
 				x_test_batch, y_test_batch = zip(*test_batch)
-				accuracy_result = accuracy.eval(feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
-				current_loss = cross_entropy.eval(feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
+				accuracy_result = accuracy.eval(session=sess, feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
+				current_loss = cross_entropy.eval(session=sess, feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
 				accuracies.append(accuracy_result)
 				losses.append(current_loss)
 
@@ -327,8 +327,8 @@ if FLAGS.train:
 	losses = []
 	for test_batch in test_batches:
 		x_test_batch, y_test_batch = zip(*test_batch)
-		accuracy_result = accuracy.eval(feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
-		current_loss = cross_entropy.eval(feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
+		accuracy_result = accuracy.eval(session=sess, feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
+		current_loss = cross_entropy.eval(session=sess, feed_dict={data_in: x_test_batch, data_out: y_test_batch, dropout_keep_prob: 1.0})
 		accuracies.append(accuracy_result)
 		losses.append(current_loss)
 
@@ -356,6 +356,6 @@ if FLAGS.save:
 	saver = tf.train.Saver()
 	saver.save(sess, CHECKPOINT_FILE_PATH)
 
-while True:
-	t = raw_input("\n\nTweet to analyze: ")
-	print (evaluate_sentence(t, vocabulary))
+# while True:
+# 	t = raw_input("\n\nTweet to analyze: ")
+# 	print (evaluate_sentence(t, vocabulary))
